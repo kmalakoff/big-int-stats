@@ -38,8 +38,8 @@ describe('BigIntStats', function () {
       assert.ok(!err);
 
       for (var index in names) {
-        const numStats = fs.lstatSync(path.join(DIR, names[index]));
-        const bigintStats = new BigIntStats(numStats);
+        var numStats = fs.statSync(path.join(DIR, names[index]));
+        var bigintStats = new BigIntStats(numStats);
         verifyStats(bigintStats, numStats, 1000);
         spys(numStats);
         spys(bigintStats);
@@ -47,8 +47,8 @@ describe('BigIntStats', function () {
 
       assert.equal(spys.callCount, 12);
       assert.equal(spys.dir.callCount, 6);
-      assert.equal(spys.file.callCount, 4);
-      assert.equal(spys.link.callCount, 2);
+      assert.equal(spys.file.callCount, 6);
+      assert.equal(spys.link.callCount, 0);
       done();
     });
   });

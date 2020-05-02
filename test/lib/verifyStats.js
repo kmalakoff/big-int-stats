@@ -3,9 +3,10 @@ var inspect = require('util').inspect;
 var isDate = require('lodash.isdate');
 var endsWith = require('end-with');
 var isSafeInteger = require('is-safe-integer');
-var BigInteger = require('big.js');
+// eslint-disable-next-line no-undef
+var BigInteger = typeof BigInt === 'undefined' ? require('big.js') : BigInt;
 
-var kNsPerMsBigInt = BigInteger(10).pow(6).value;
+var kNsPerMsBigInt = BigInteger(Math.pow(10, 6));
 
 module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
   // allowableDelta: It's possible that the file stats are updated between the
@@ -22,7 +23,8 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
         'difference of ' + key + '.getTime() should <= ' + allowableDelta + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
       );
     } else if (key === 'mode') {
-      assert.strictEqual(bigintStats[key], BigInteger(val).value);
+      if (bigintStats[key].eq) assert.ok(bigintStats[key].eq(BigInteger(val)));
+      else assert.strictEqual(bigintStats[key], BigInteger(val));
       assert.strictEqual(bigintStats.isBlockDevice(), numStats.isBlockDevice());
       assert.strictEqual(bigintStats.isCharacterDevice(), numStats.isCharacterDevice());
       assert.strictEqual(bigintStats.isDirectory(), numStats.isDirectory());
@@ -34,7 +36,7 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       var nsKey = key.replace('Ms', 'Ns');
       var msFromBigInt = bigintStats[key];
       var nsFromBigInt = bigintStats[nsKey];
-      var msFromBigIntNs = Number(BigInteger(nsFromBigInt).divide(kNsPerMsBigInt).value);
+      var msFromBigIntNs = Number(nsFromBigInt.div ? nsFromBigInt.div(kNsPerMsBigInt) : nsFromBigInt / kNsPerMsBigInt);
       var msFromNum = numStats[key];
 
       assert(
@@ -60,11 +62,14 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
           allowableDelta
       );
     } else if (isSafeInteger(val)) {
-      assert.strictEqual(
-        bigintStats[key],
-        BigInteger(val).value,
-        inspect(bigintStats[key]) + ' !== ' + inspect(BigInteger(val).value) + '\n' + 'key=' + key + ', val=' + val
-      );
+      if (bigintStats[key].eq)
+        assert.ok(bigintStats[key].eq(BigInteger(val)), inspect(bigintStats[key]) + ' !== ' + inspect(BigInteger(val)) + '\n' + 'key=' + key + ', val=' + val);
+      else
+        assert.strictEqual(
+          bigintStats[key],
+          BigInteger(val),
+          inspect(bigintStats[key]) + ' !== ' + inspect(BigInteger(val)) + '\n' + 'key=' + key + ', val=' + val
+        );
     } else {
       assert(
         Number(bigintStats[key]) - val < 1,
