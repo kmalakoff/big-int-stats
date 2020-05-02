@@ -3,10 +3,9 @@ var inspect = require('util').inspect;
 var isDate = require('lodash.isdate');
 var endsWith = require('end-with');
 var isSafeInteger = require('is-safe-integer');
+var BigInteger = require('big.js');
 
-var BigInteger = require('../../lib/BigInteger');
-
-var kNsPerMsBigInt = BigInteger.pow(10, 6).value;
+var kNsPerMsBigInt = BigInteger(10).pow(6).value;
 
 module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
   // allowableDelta: It's possible that the file stats are updated between the
