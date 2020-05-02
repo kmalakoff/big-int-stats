@@ -40,7 +40,7 @@ describe('BigIntStats', function () {
       for (var index in names) {
         const numStats = fs.lstatSync(path.join(DIR, names[index]));
         const bigintStats = new BigIntStats(numStats);
-        verifyStats(bigintStats, numStats, 100);
+        verifyStats(bigintStats, numStats, 1000);
         spys(numStats);
         spys(bigintStats);
       }
