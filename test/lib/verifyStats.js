@@ -1,11 +1,12 @@
 var assert = require('assert');
 var inspect = require('util').inspect;
 var isDate = require('lodash.isdate');
+var endsWith = require('end-with');
+var isSafeInteger = require('is-safe-integer');
 
-var pow = require('../../lib/pow');
-var BigInt = require('../../lib/BigInt');
+var BigInteger = require('../../lib/BigInteger');
 
-var kNsPerMsBigInt = pow(10, 6);
+var kNsPerMsBigInt = BigInteger.pow(10, 6).value;
 
 module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
   // allowableDelta: It's possible that the file stats are updated between the
@@ -22,7 +23,7 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
         'difference of ' + key + '.getTime() should <= ' + allowableDelta + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
       );
     } else if (key === 'mode') {
-      assert.strictEqual(bigintStats[key], BigInt(val));
+      assert.strictEqual(bigintStats[key], BigInteger(val).value);
       assert.strictEqual(bigintStats.isBlockDevice(), numStats.isBlockDevice());
       assert.strictEqual(bigintStats.isCharacterDevice(), numStats.isCharacterDevice());
       assert.strictEqual(bigintStats.isDirectory(), numStats.isDirectory());
@@ -30,11 +31,11 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       assert.strictEqual(bigintStats.isFile(), numStats.isFile());
       assert.strictEqual(bigintStats.isSocket(), numStats.isSocket());
       assert.strictEqual(bigintStats.isSymbolicLink(), numStats.isSymbolicLink());
-    } else if (key.endsWith('Ms')) {
+    } else if (endsWith(key, 'Ms')) {
       var nsKey = key.replace('Ms', 'Ns');
       var msFromBigInt = bigintStats[key];
       var nsFromBigInt = bigintStats[nsKey];
-      var msFromBigIntNs = Number(nsFromBigInt / kNsPerMsBigInt);
+      var msFromBigIntNs = Number(BigInteger(nsFromBigInt).divide(kNsPerMsBigInt).value);
       var msFromNum = numStats[key];
 
       assert(
@@ -59,8 +60,12 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
           'ms, Allowable delta = ' +
           allowableDelta
       );
-    } else if (Number.isSafeInteger(val)) {
-      assert.strictEqual(bigintStats[key], BigInt(val), inspect(bigintStats[key]) + ' !== ' + inspect(BigInt(val)) + '\n' + 'key=' + key + ', val=' + val);
+    } else if (isSafeInteger(val)) {
+      assert.strictEqual(
+        bigintStats[key],
+        BigInteger(val).value,
+        inspect(bigintStats[key]) + ' !== ' + inspect(BigInteger(val).value) + '\n' + 'key=' + key + ', val=' + val
+      );
     } else {
       assert(
         Number(bigintStats[key]) - val < 1,
