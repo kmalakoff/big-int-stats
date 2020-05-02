@@ -1,24 +1,28 @@
 var assert = require('assert');
-var BigInt = require('big-integer');
-var { isDate } = require('util').types;
-var { inspect } = require('util');
+var inspect = require('util').inspect;
+var isDate = require('lodash.isdate');
+
 var pow = require('../../lib/pow');
-var kNsPerMsBigInt = pow(10n, 6n);
+var BigInt = require('../../lib/BigInt');
+
+var kNsPerMsBigInt = pow(10, 6);
 
 module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
   // allowableDelta: It's possible that the file stats are updated between the
   // two stat() calls so allow for a small difference.
-  for (var key of Object.keys(numStats)) {
+  for (var key in numStats) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (!numStats.hasOwnProperty(key)) continue;
     var val = numStats[key];
     if (isDate(val)) {
       var time = val.getTime();
       var time2 = bigintStats[key].getTime();
       assert(
         time - time2 <= allowableDelta,
-        `difference of ${key}.getTime() should <= ${allowableDelta}.\n` + `Number version ${time}, BigInt version ${time2}n`
+        'difference of ' + key + '.getTime() should <= ' + allowableDelta + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
       );
     } else if (key === 'mode') {
-      assert.strictEqual(bigintStats[key], BigInt(val).value);
+      assert.strictEqual(bigintStats[key], BigInt(val));
       assert.strictEqual(bigintStats.isBlockDevice(), numStats.isBlockDevice());
       assert.strictEqual(bigintStats.isCharacterDevice(), numStats.isCharacterDevice());
       assert.strictEqual(bigintStats.isDirectory(), numStats.isDirectory());
@@ -35,19 +39,32 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
 
       assert(
         msFromNum - Number(msFromBigInt) <= allowableDelta,
-        `Number version ${key} = ${msFromNum}, ` + `BigInt version ${key} = ${msFromBigInt}n, ` + `Allowable delta = ${allowableDelta}`
+        'Number version ' + key + ' = ' + msFromNum + ', ' + 'BigInt version ' + key + ' = ' + msFromBigInt + 'n, ' + 'Allowable delta = ' + allowableDelta
       );
 
       assert(
         msFromNum - Number(msFromBigIntNs) <= allowableDelta,
-        `Number version ${key} = ${msFromNum}, ` + `BigInt version ${nsKey} = ${nsFromBigInt}n` + ` = ${msFromBigIntNs}ms, Allowable delta = ${allowableDelta}`
+        'Number version ' +
+          key +
+          ' = ' +
+          msFromNum +
+          ', ' +
+          'BigInt version ' +
+          nsKey +
+          ' = ' +
+          nsFromBigInt +
+          'n' +
+          ' = ' +
+          msFromBigIntNs +
+          'ms, Allowable delta = ' +
+          allowableDelta
       );
     } else if (Number.isSafeInteger(val)) {
-      assert.strictEqual(bigintStats[key], BigInt(val).value, `${inspect(bigintStats[key])} !== ${inspect(BigInt(val).value)}\n` + `key=${key}, val=${val}`);
+      assert.strictEqual(bigintStats[key], BigInt(val), inspect(bigintStats[key]) + ' !== ' + inspect(BigInt(val)) + '\n' + 'key=' + key + ', val=' + val);
     } else {
       assert(
         Number(bigintStats[key]) - val < 1,
-        `${key} is not a safe integer, difference should < 1.\n` + `Number version ${val}, BigInt version ${bigintStats[key]}n`
+        key + ' is not a safe integer, difference should < 1.\n' + 'Number version ' + val + ', BigInt version ' + bigintStats[key] + 'n'
       );
     }
   }
