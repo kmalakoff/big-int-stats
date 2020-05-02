@@ -28,7 +28,6 @@
   "license": "MIT",
   "homepage": "https://github.com/kmalakoff/big-int-stats",
   "dependencies": {
-    "big.js": "^1.6.48",
     "big.js": "^5.2.2"
   },
   "devDependencies": {
