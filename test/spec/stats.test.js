@@ -38,12 +38,9 @@ describe('BigIntStats', function () {
       assert.ok(!err);
 
       for (var index in names) {
-        const startTime = process.hrtime.bigint();
         const numStats = fs.lstatSync(path.join(DIR, names[index]));
         const bigintStats = new BigIntStats(numStats);
-        const endTime = process.hrtime.bigint();
-        const allowableDelta = Math.ceil(Number(endTime - startTime) / 1e6);
-        verifyStats(bigintStats, numStats, allowableDelta);
+        verifyStats(bigintStats, numStats, 100);
         spys(numStats);
         spys(bigintStats);
       }
@@ -56,10 +53,3 @@ describe('BigIntStats', function () {
     });
   });
 });
-
-// const startTime = process.hrtime.bigint();
-// const bigintStats = func(arg, { bigint: true });
-// const numStats = func(arg);
-// const endTime = process.hrtime.bigint();
-// const allowableDelta = Math.ceil(Number(endTime - startTime) / 1e6);
-// verifyStats(bigintStats, numStats, allowableDelta);
