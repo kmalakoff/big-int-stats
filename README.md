@@ -6,18 +6,26 @@ Create BigIntStats from fs.Stats for compatiblity on earlier versions of Node.js
 var assert = require('assert');
 var BigIntStats = require('big-int-stats');
 var fs = require('fs');
-var each = require('async-each');
 
-function create(root, name, callback) {
-  return fs.lstat(path.join(root, name), function (err, stats) {
-    err ? callback(err) : callback(null, new BigIntStats(stats));
-  });
-}
+var smallStats = fs.statSync(__dirname);
+var testBigStats1 = new BigIntStats(smallStats);
 
-fs.readdir(__dirname, function (err, names) {
-  each(names, create.bind(null, DIR), function (err, stats) {
-    for (var index in stats) assert.ok(stats[index] instanceof BigIntStats);
-  }
-}
+var bigStats = fs.lstatSync(__dirname, { bigint: true });
+var testBigStats2 = new BigIntStats(
+  bigStats.dev,
+  bigStats.mode,
+  bigStats.nlink,
+  bigStats.uid,
+  bigStats.gid,
+  bigStats.rdev,
+  bigStats.blksize,
+  bigStats.ino,
+  bigStats.size,
+  bigStats.blocks,
+  bigStats.atimeNs,
+  bigStats.mtimeNs,
+  bigStats.ctimeNs,
+  bigStats.birthtimeNs
+);
 
 ```

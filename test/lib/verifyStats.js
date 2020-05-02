@@ -6,6 +6,9 @@ var isSafeInteger = require('is-safe-integer');
 // eslint-disable-next-line no-undef
 var BigInteger = typeof BigInt === 'undefined' ? require('big.js') : BigInt;
 
+var div = require('../../lib/div');
+
+var hasBigInt = typeof BigInt !== 'undefined';
 var kNsPerMsBigInt = BigInteger(Math.pow(10, 6));
 
 module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
@@ -23,8 +26,8 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
         'difference of ' + key + '.getTime() should <= ' + allowableDelta + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
       );
     } else if (key === 'mode') {
-      if (bigintStats[key].eq) assert.ok(bigintStats[key].eq(BigInteger(val)));
-      else assert.strictEqual(bigintStats[key], BigInteger(val));
+      if (hasBigInt) assert.strictEqual(bigintStats[key], BigInteger(val));
+      else assert.ok(bigintStats[key].eq(BigInteger(val)));
       assert.strictEqual(bigintStats.isBlockDevice(), numStats.isBlockDevice());
       assert.strictEqual(bigintStats.isCharacterDevice(), numStats.isCharacterDevice());
       assert.strictEqual(bigintStats.isDirectory(), numStats.isDirectory());
@@ -36,7 +39,7 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       var nsKey = key.replace('Ms', 'Ns');
       var msFromBigInt = bigintStats[key];
       var nsFromBigInt = bigintStats[nsKey];
-      var msFromBigIntNs = Number(nsFromBigInt.div ? nsFromBigInt.div(kNsPerMsBigInt) : nsFromBigInt / kNsPerMsBigInt);
+      var msFromBigIntNs = Number(div(nsFromBigInt, kNsPerMsBigInt));
       var msFromNum = numStats[key];
 
       assert(
@@ -62,14 +65,14 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
           allowableDelta
       );
     } else if (isSafeInteger(val)) {
-      if (bigintStats[key].eq)
-        assert.ok(bigintStats[key].eq(BigInteger(val)), inspect(bigintStats[key]) + ' !== ' + inspect(BigInteger(val)) + '\n' + 'key=' + key + ', val=' + val);
-      else
+      if (hasBigInt)
         assert.strictEqual(
           bigintStats[key],
           BigInteger(val),
           inspect(bigintStats[key]) + ' !== ' + inspect(BigInteger(val)) + '\n' + 'key=' + key + ', val=' + val
         );
+      else
+        assert.ok(bigintStats[key].eq(BigInteger(val)), inspect(bigintStats[key]) + ' !== ' + inspect(BigInteger(val)) + '\n' + 'key=' + key + ', val=' + val);
     } else {
       assert(
         Number(bigintStats[key]) - val < 1,
