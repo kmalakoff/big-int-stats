@@ -10,6 +10,7 @@ var isDate = require('lodash.isdate');
 var BigInteger = typeof BigInt === 'undefined' ? require('big.js') : BigInt;
 
 var BigIntStats = require('../..');
+var patchBigIntStats = require('../lib/patchBigIntStats');
 var verifyStats = require('../lib/verifyStats');
 var div = require('../../lib/div');
 
@@ -73,10 +74,7 @@ describe('BigIntStats', function () {
         for (var index in names) {
           var bigStats = fs.lstatSync(path.join(DIR, names[index]), { bigint: true });
 
-          var atimeNs = bigStats.atimeNs ? bigStats.atimeNs : bigStats.atimeMs * kNsPerMsBigInt;
-          var mtimeNs = bigStats.mtimeNs ? bigStats.mtimeNs : bigStats.mtimeMs * kNsPerMsBigInt;
-          var ctimeNs = bigStats.ctimeNs ? bigStats.ctimeNs : bigStats.ctimeMs * kNsPerMsBigInt;
-          var birthtimeNs = bigStats.birthtimeNs ? bigStats.birthtimeNs : bigStats.birthtimeMs * kNsPerMsBigInt;
+          bigStats = patchBigIntStats(bigStats);
 
           var smallStats = new fs.Stats(
             Number(bigStats.dev),
@@ -89,10 +87,10 @@ describe('BigIntStats', function () {
             Number(bigStats.ino),
             Number(bigStats.size),
             Number(bigStats.blocks),
-            Number(div(atimeNs, kNsPerMsBigInt)),
-            Number(div(mtimeNs, kNsPerMsBigInt)),
-            Number(div(ctimeNs, kNsPerMsBigInt)),
-            Number(div(birthtimeNs, kNsPerMsBigInt))
+            Number(div(bigStats.atimeNs, kNsPerMsBigInt)),
+            Number(div(bigStats.mtimeNs, kNsPerMsBigInt)),
+            Number(div(bigStats.ctimeNs, kNsPerMsBigInt)),
+            Number(div(bigStats.birthtimeNs, kNsPerMsBigInt))
           );
           var testBigStats = new BigIntStats(
             bigStats.dev,
@@ -105,10 +103,10 @@ describe('BigIntStats', function () {
             bigStats.ino,
             bigStats.size,
             bigStats.blocks,
-            atimeNs,
-            mtimeNs,
-            ctimeNs,
-            birthtimeNs
+            bigStats.atimeNs,
+            bigStats.mtimeNs,
+            bigStats.ctimeNs,
+            bigStats.birthtimeNs
           );
 
           verifyStats(testBigStats, smallStats, ALLOWABLE_DELTA);
