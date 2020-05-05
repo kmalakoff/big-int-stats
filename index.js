@@ -1,8 +1,6 @@
 var fs = require('fs');
-// eslint-disable-next-line no-undef
-var BigInteger = typeof BigInt === 'undefined' ? require('big.js') : BigInt;
-
-var div = require('./lib/div');
+var extend = require('legacy-extends');
+var BigInteger = require('./lib/bigint-compat');
 
 // eslint-disable-next-line node/no-deprecated-api
 var constants = require('constants');
@@ -14,9 +12,9 @@ var S_IFMT_BIG = BigInteger(S_IFMT);
 
 var StatsBase = fs.Stats;
 var isWindows = process.platform === 'win32';
-var hasBigInt = typeof BigInt !== 'undefined';
 var kNsPerMsBigInt = BigInteger(Math.pow(10, 6));
-var kNsPerMsInt = Math.pow(10, 6);
+
+if (!Math.clz32) Math.clz32 = require('clz32');
 
 // The Date constructor performs Math.floor() to the timestamp.
 // https://www.ecma-international.org/ecma-262/#sec-timeclip
@@ -28,112 +26,90 @@ function dateFromMs(ms) {
   return new Date(Number(ms) + 0.5);
 }
 
-function construct(dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks, atimeNs, mtimeNs, ctimeNs, birthtimeNs) {
-  StatsBase.call(this, dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks, atimeNs, mtimeNs, ctimeNs, birthtimeNs);
-  if (this.dev === dev) return;
-  this.dev = dev;
-  this.mode = mode;
-  this.nlink = nlink;
-  this.uid = uid;
-  this.gid = gid;
-  this.rdev = rdev;
-  this.blksize = blksize;
-  this.ino = ino;
-  this.size = size;
-  this.blocks = blocks;
-  this.atimeNs = atimeNs;
-  this.mtimeNs = mtimeNs;
-  this.ctimeNs = ctimeNs;
-  this.birthtimeNs = birthtimeNs;
-}
+function BigIntStats(dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks, atimeNs, mtimeNs, ctimeNs, birthtimeNs) {
+  var self;
+  var stats = null;
+  if (dev instanceof StatsBase) {
+    stats = dev;
 
-module.exports = (function () {
-  function BigIntStats(dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks, atimeNs, mtimeNs, ctimeNs, birthtimeNs) {
-    var stats = null;
-    if (dev instanceof StatsBase) {
-      stats = dev;
-
-      construct.call(
-        this,
-        BigInteger(stats.dev),
-        BigInteger(stats.mode),
-        BigInteger(stats.nlink),
-        BigInteger(stats.uid),
-        BigInteger(stats.gid),
-        BigInteger(stats.rdev),
-        BigInteger(stats.blksize),
-        BigInteger(stats.ino),
-        BigInteger(stats.size),
-        BigInteger(stats.blocks)
-      );
-      if (stats.atimeMs) {
-        this.atime = dateFromMs(stats.atimeMs);
-        this.atimeMs = stats.atimeMs;
-        this.atimeNs = BigInteger(Number(this.atimeMs * kNsPerMsInt));
-      } else if (stats.atime) {
-        this.atime = stats.atime;
-        this.atimeMs = stats.atime.valueOf() * 1000;
-        this.atimeNs = BigInteger(Number(this.atimeMs * kNsPerMsInt));
-      }
-      if (stats.mtimeMs) {
-        this.mtime = dateFromMs(stats.mtimeMs);
-        this.mtimeMs = stats.mtimeMs;
-        this.mtimeNs = BigInteger(Number(this.mtimeMs * kNsPerMsInt));
-      } else if (stats.mtime) {
-        this.mtime = stats.mtime;
-        this.mtimeMs = stats.mtime.valueOf() * 1000;
-        this.mtimeNs = BigInteger(Number(this.mtimeMs * kNsPerMsInt));
-      }
-      if (stats.ctimeMs) {
-        this.ctime = dateFromMs(stats.ctimeMs);
-        this.ctimeMs = stats.ctimeMs;
-        this.ctimeNs = BigInteger(Number(this.ctimeMs * kNsPerMsInt));
-      } else if (stats.ctime) {
-        this.ctime = stats.ctime;
-        this.ctimeMs = stats.ctime.valueOf() * 1000;
-        this.ctimeNs = BigInteger(Number(this.ctimeMs * kNsPerMsInt));
-      }
-      if (stats.birthtimeMs) {
-        this.birthtime = dateFromMs(stats.birthtimeMs);
-        this.birthtimeMs = stats.birthtimeMs;
-        this.birthtimeNs = BigInteger(Number(this.birthtimeMs * kNsPerMsInt));
-      } else if (stats.birthtime) {
-        this.birthtime = stats.birthtime;
-        this.birthtimeMs = stats.birthtime.valueOf() * 1000;
-        this.birthtimeNs = BigInteger(Number(this.birthtimeMs * kNsPerMsInt));
-      }
-    } else {
-      construct.call(this, dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks);
-      this.atimeMs = BigInteger(Number(div(atimeNs, kNsPerMsBigInt)));
-      this.atime = dateFromMs(this.atimeMs);
-      this.atimeNs = atimeNs;
-
-      this.mtimeMs = BigInteger(Number(div(mtimeNs, kNsPerMsBigInt)));
-      this.mtime = dateFromMs(this.mtimeMs);
-      this.mtimeNs = mtimeNs;
-
-      this.ctimeMs = BigInteger(Number(div(ctimeNs, kNsPerMsBigInt)));
-      this.ctime = dateFromMs(this.ctimeMs);
-      this.ctimeNs = ctimeNs;
-
-      this.birthtimeMs = BigInteger(Number(div(birthtimeNs, kNsPerMsBigInt)));
-      this.birthtime = dateFromMs(this.birthtimeMs);
-      this.birthtimeNs = birthtimeNs;
+    self = BigIntStats.__constructor__.call(
+      this,
+      BigInteger(stats.dev),
+      BigInteger(stats.mode),
+      BigInteger(stats.nlink),
+      BigInteger(stats.uid),
+      BigInteger(stats.gid),
+      BigInteger(stats.rdev),
+      BigInteger(stats.blksize),
+      BigInteger(stats.ino),
+      BigInteger(stats.size),
+      BigInteger(stats.blocks)
+    );
+    if (stats.atimeMs) {
+      self.atime = dateFromMs(stats.atimeMs);
+      self.atimeMs = BigInteger(Math.round(stats.atimeMs));
+      self.atimeNs = BigInteger.times(self.atimeMs, kNsPerMsBigInt);
+    } else if (stats.atime) {
+      self.atime = stats.atime;
+      self.atimeMs = BigInteger(stats.atime.valueOf() * 1000);
+      self.atimeNs = BigInteger.times(self.atimeMs, kNsPerMsBigInt);
     }
+    if (stats.mtimeMs) {
+      self.mtime = dateFromMs(stats.mtimeMs);
+      self.mtimeMs = BigInteger(Math.round(stats.mtimeMs));
+      self.mtimeNs = BigInteger.times(self.mtimeMs, kNsPerMsBigInt);
+    } else if (stats.mtime) {
+      self.mtime = stats.mtime;
+      self.mtimeMs = BigInteger(stats.mtime.valueOf() * 1000);
+      self.mtimeNs = BigInteger.times(self.mtimeMs, kNsPerMsBigInt);
+    }
+    if (stats.ctimeMs) {
+      self.ctime = dateFromMs(stats.ctimeMs);
+      self.ctimeMs = BigInteger(Math.round(stats.ctimeMs));
+      self.ctimeNs = BigInteger.times(self.ctimeMs, kNsPerMsBigInt);
+    } else if (stats.ctime) {
+      self.ctime = stats.ctime;
+      self.ctimeMs = BigInteger(stats.ctime.valueOf() * 1000);
+      self.ctimeNs = BigInteger.times(self.ctimeMs, kNsPerMsBigInt);
+    }
+    if (stats.birthtimeMs) {
+      self.birthtime = dateFromMs(stats.birthtimeMs);
+      self.birthtimeMs = BigInteger(Math.round(stats.birthtimeMs));
+      self.birthtimeNs = BigInteger.times(self.birthtimeMs, kNsPerMsBigInt);
+    } else if (stats.birthtime) {
+      self.birthtime = stats.birthtime;
+      self.birthtimeMs = BigInteger(stats.birthtime.valueOf() * 1000);
+      self.birthtimeNs = BigInteger.times(self.birthtimeMs, kNsPerMsBigInt);
+    }
+  } else {
+    self = BigIntStats.__constructor__.call(this, dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks);
+    self.atimeMs = BigInteger.divide(atimeNs, kNsPerMsBigInt);
+    self.atime = dateFromMs(self.atimeMs);
+    self.atimeNs = atimeNs;
 
-    if (!hasBigInt && this.mode) this.modeSmall = +this.mode.toFixed();
-    return this;
+    self.mtimeMs = BigInteger.divide(mtimeNs, kNsPerMsBigInt);
+    self.mtime = dateFromMs(self.mtimeMs);
+    self.mtimeNs = mtimeNs;
+
+    self.ctimeMs = BigInteger.divide(ctimeNs, kNsPerMsBigInt);
+    self.ctime = dateFromMs(self.ctimeMs);
+    self.ctimeNs = ctimeNs;
+
+    self.birthtimeMs = BigInteger.divide(birthtimeNs, kNsPerMsBigInt);
+    self.birthtime = dateFromMs(self.birthtimeMs);
+    self.birthtimeNs = birthtimeNs;
   }
-  BigIntStats.prototype = Object.create(StatsBase.prototype);
-  BigIntStats.prototype.constructor = BigIntStats;
 
-  BigIntStats.prototype._checkModeProperty = function (property) {
-    if (isWindows && (property === S_IFIFO || property === S_IFBLK || property === S_IFSOCK)) {
-      return false; // Some types are not available on Windows
-    }
-    if (this.modeSmall) return (this.modeSmall & S_IFMT) === property;
-    else return (this.mode & S_IFMT_BIG) === BigInteger(property);
-  };
+  return self;
+}
+var argNames = ['dev', 'mode', 'nlink', 'uid', 'gid', 'rdev', 'blksize', 'ino', 'size', 'blocks', 'atimeNs', 'mtimeNs', 'ctimeNs', 'birthtimeNs'];
+extend(BigIntStats, StatsBase, argNames);
 
-  return BigIntStats;
-})();
+BigIntStats.prototype._checkModeProperty = function (property) {
+  if (isWindows && (property === S_IFIFO || property === S_IFBLK || property === S_IFSOCK)) {
+    return false; // Some types are not available on Windows
+  }
+  return BigInteger.eq(BigInteger.bitwiseAnd(this.mode, S_IFMT_BIG), BigInteger(property));
+};
+
+module.exports = BigIntStats;

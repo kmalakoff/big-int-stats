@@ -6,15 +6,12 @@ var fs = require('fs');
 var statsSpys = require('fs-stats-spys');
 var endsWith = require('end-with');
 var isDate = require('lodash.isdate');
-// eslint-disable-next-line no-undef
-var BigInteger = typeof BigInt === 'undefined' ? require('big.js') : BigInt;
+var BigInteger = require('../../lib/bigint-compat');
 
 var BigIntStats = require('../..');
 var patchBigIntStats = require('../lib/patchBigIntStats');
 var verifyStats = require('../lib/verifyStats');
-var div = require('../../lib/div');
 
-var hasBigInt = typeof BigInt !== 'undefined';
 var kNsPerMsBigInt = BigInteger(Math.pow(10, 6));
 
 var DIR = path.resolve(path.join(__dirname, '..', 'data'));
@@ -64,7 +61,7 @@ describe('BigIntStats', function () {
     });
   });
 
-  !hasBigInt ||
+  typeof BigInt === 'undefined' ||
     it('should initialize from with bigInt option', function (done) {
       var spys = statsSpys();
 
@@ -87,10 +84,10 @@ describe('BigIntStats', function () {
             Number(bigStats.ino),
             Number(bigStats.size),
             Number(bigStats.blocks),
-            Number(div(bigStats.atimeNs, kNsPerMsBigInt)),
-            Number(div(bigStats.mtimeNs, kNsPerMsBigInt)),
-            Number(div(bigStats.ctimeNs, kNsPerMsBigInt)),
-            Number(div(bigStats.birthtimeNs, kNsPerMsBigInt))
+            Number(BigInteger.divide(bigStats.atimeNs, kNsPerMsBigInt)),
+            Number(BigInteger.divide(bigStats.mtimeNs, kNsPerMsBigInt)),
+            Number(BigInteger.divide(bigStats.ctimeNs, kNsPerMsBigInt)),
+            Number(BigInteger.divide(bigStats.birthtimeNs, kNsPerMsBigInt))
           );
           var testBigStats = new BigIntStats(
             bigStats.dev,
@@ -131,14 +128,10 @@ describe('BigIntStats', function () {
           if (isDate(bigStats[key])) {
             var time = bigStats[key].getTime();
             var time2 = testBigStats[key].getTime();
-            try {
-              assert(
-                time - time2 <= ALLOWABLE_DELTA,
-                'difference of ' + key + '.getTime() should <= ' + ALLOWABLE_DELTA + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
-              );
-            } catch (err) {
-              debugger;
-            }
+            assert(
+              time - time2 <= ALLOWABLE_DELTA,
+              'difference of ' + key + '.getTime() should <= ' + ALLOWABLE_DELTA + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
+            );
           } else {
             assert.strictEqual(bigStats[key], testBigStats[key], key);
           }
