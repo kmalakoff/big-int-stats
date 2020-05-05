@@ -27,12 +27,9 @@ function dateFromMs(ms) {
 }
 
 function BigIntStats(dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks, atimeNs, mtimeNs, ctimeNs, birthtimeNs) {
-  var self;
-  var stats = null;
   if (dev instanceof StatsBase) {
-    stats = dev;
-
-    self = BigIntStats.__constructor__.call(
+    var stats = dev;
+    var self = BigIntStats.__super__.construct.call(
       this,
       BigInteger(stats.dev),
       BigInteger(stats.mode),
@@ -81,25 +78,26 @@ function BigIntStats(dev, mode, nlink, uid, gid, rdev, blksize, ino, size, block
       self.birthtimeMs = BigInteger(stats.birthtime.valueOf() * 1000);
       self.birthtimeNs = BigInteger.times(self.birthtimeMs, kNsPerMsBigInt);
     }
-  } else {
-    self = BigIntStats.__constructor__.call(this, dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks);
-    self.atimeMs = BigInteger.divide(atimeNs, kNsPerMsBigInt);
-    self.atime = dateFromMs(self.atimeMs);
-    self.atimeNs = atimeNs;
-
-    self.mtimeMs = BigInteger.divide(mtimeNs, kNsPerMsBigInt);
-    self.mtime = dateFromMs(self.mtimeMs);
-    self.mtimeNs = mtimeNs;
-
-    self.ctimeMs = BigInteger.divide(ctimeNs, kNsPerMsBigInt);
-    self.ctime = dateFromMs(self.ctimeMs);
-    self.ctimeNs = ctimeNs;
-
-    self.birthtimeMs = BigInteger.divide(birthtimeNs, kNsPerMsBigInt);
-    self.birthtime = dateFromMs(self.birthtimeMs);
-    self.birthtimeNs = birthtimeNs;
+    return self;
   }
 
+  // eslint-disable-next-line no-redeclare
+  var self = BigIntStats.__super__.construct.call(this, dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks);
+  self.atimeMs = BigInteger.divide(atimeNs, kNsPerMsBigInt);
+  self.atime = dateFromMs(self.atimeMs);
+  self.atimeNs = atimeNs;
+
+  self.mtimeMs = BigInteger.divide(mtimeNs, kNsPerMsBigInt);
+  self.mtime = dateFromMs(self.mtimeMs);
+  self.mtimeNs = mtimeNs;
+
+  self.ctimeMs = BigInteger.divide(ctimeNs, kNsPerMsBigInt);
+  self.ctime = dateFromMs(self.ctimeMs);
+  self.ctimeNs = ctimeNs;
+
+  self.birthtimeMs = BigInteger.divide(birthtimeNs, kNsPerMsBigInt);
+  self.birthtime = dateFromMs(self.birthtimeMs);
+  self.birthtimeNs = birthtimeNs;
   return self;
 }
 var argNames = ['dev', 'mode', 'nlink', 'uid', 'gid', 'rdev', 'blksize', 'ino', 'size', 'blocks', 'atimeNs', 'mtimeNs', 'ctimeNs', 'birthtimeNs'];
