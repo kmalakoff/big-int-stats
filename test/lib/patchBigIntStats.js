@@ -1,13 +1,14 @@
-// eslint-disable-next-line no-undef
-var kNsPerMsBigInt = typeof BigInt === 'undefined' ? Math.pow(10, 6) : BigInt(Math.pow(10, 6));
+var BigInteger = require('../../lib/bigint-compat');
+
+var kNsPerMsBigInt = BigInteger(Math.pow(10, 6));
 
 module.exports = function patchBigIntStats(stats) {
   // doesn't need patching
-  if (typeof stats.atimeMs !== 'bigint' || stats.atimeNs) return stats;
+  if (stats.atimeNs || !BigInteger.isBigInt(stats.atimeMs)) return stats;
 
-  stats.atimeNs = stats.atimeMs * kNsPerMsBigInt;
-  stats.mtimeNs = stats.mtimeMs * kNsPerMsBigInt;
-  stats.ctimeNs = stats.ctimeMs * kNsPerMsBigInt;
-  stats.birthtimeNs = stats.birthtimeMs * kNsPerMsBigInt;
+  stats.atimeNs = BigInteger.times(stats.atimeMs, kNsPerMsBigInt);
+  stats.mtimeNs = BigInteger.times(stats.mtimeMs, kNsPerMsBigInt);
+  stats.ctimeNs = BigInteger.times(stats.ctimeMs, kNsPerMsBigInt);
+  stats.birthtimeNs = BigInteger.times(stats.birthtimeMs, kNsPerMsBigInt);
   return stats;
 };
