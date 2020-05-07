@@ -6,13 +6,13 @@ var fs = require('fs');
 var statsSpys = require('fs-stats-spys');
 var endsWith = require('end-with');
 var isDate = require('lodash.isdate');
-var BigInteger = require('../../lib/bigint-compat');
+var JSBI = require('jsbi-compat');
 
 var BigIntStats = require('../..');
 var patchBigIntStats = require('../lib/patchBigIntStats');
 var verifyStats = require('../lib/verifyStats');
 
-var kNsPerMsBigInt = BigInteger(Math.pow(10, 6));
+var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
 
 var DIR = path.resolve(path.join(__dirname, '..', 'data'));
 var STRUCTURE = {
@@ -84,10 +84,10 @@ describe('BigIntStats', function () {
             Number(bigStats.ino),
             Number(bigStats.size),
             Number(bigStats.blocks),
-            Number(BigInteger.divide(bigStats.atimeNs, kNsPerMsBigInt)),
-            Number(BigInteger.divide(bigStats.mtimeNs, kNsPerMsBigInt)),
-            Number(BigInteger.divide(bigStats.ctimeNs, kNsPerMsBigInt)),
-            Number(BigInteger.divide(bigStats.birthtimeNs, kNsPerMsBigInt))
+            Number(JSBI.divide(bigStats.atimeNs, kNsPerMsBigInt)),
+            Number(JSBI.divide(bigStats.mtimeNs, kNsPerMsBigInt)),
+            Number(JSBI.divide(bigStats.ctimeNs, kNsPerMsBigInt)),
+            Number(JSBI.divide(bigStats.birthtimeNs, kNsPerMsBigInt))
           );
           var testBigStats = new BigIntStats(
             bigStats.dev,

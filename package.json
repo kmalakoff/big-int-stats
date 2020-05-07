@@ -29,7 +29,8 @@
   "homepage": "https://github.com/kmalakoff/big-int-stats",
   "dependencies": {
     "big.js": "^5.2.2",
-    "legacy-extends": "^0.3.0"
+    "jsbi-compat": "^0.2.0",
+    "legacy-extends": "^0.4.0"
   },
   "devDependencies": {
     "async-each": "^1.0.3",
