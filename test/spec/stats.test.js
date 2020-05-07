@@ -6,13 +6,11 @@ var fs = require('fs');
 var statsSpys = require('fs-stats-spys');
 var endsWith = require('end-with');
 var isDate = require('lodash.isdate');
-var JSBI = require('jsbi-compat');
+var normalizeStats = require('normalize-stats');
 
-var BigIntStats = require('../..');
-var patchBigIntStats = require('../lib/patchBigIntStats');
+var toBigIntStats = require('../../lib/toBigIntStats');
+var toStats = require('../../lib/toStats');
 var verifyStats = require('../lib/verifyStats');
-
-var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
 
 var DIR = path.resolve(path.join(__dirname, '..', 'data'));
 var STRUCTURE = {
@@ -46,8 +44,27 @@ describe('BigIntStats', function () {
       assert.ok(!err);
 
       for (var index in names) {
-        var smallStats = fs.statSync(path.join(DIR, names[index]));
-        var testBigStats = new BigIntStats(smallStats);
+        var smallStats = normalizeStats(fs.statSync(path.join(DIR, names[index])));
+
+        assert.ok(typeof smallStats.dev !== 'undefined');
+        assert.ok(typeof smallStats.mode !== 'undefined');
+        assert.ok(typeof smallStats.nlink !== 'undefined');
+        assert.ok(typeof smallStats.uid !== 'undefined');
+        assert.ok(typeof smallStats.gid !== 'undefined');
+        assert.ok(typeof smallStats.rdev !== 'undefined');
+        assert.ok(typeof smallStats.blksize !== 'undefined');
+        assert.ok(typeof smallStats.ino !== 'undefined');
+        assert.ok(typeof smallStats.size !== 'undefined');
+        assert.ok(typeof smallStats.blocks !== 'undefined');
+        assert.ok(typeof smallStats.atime !== 'undefined');
+        assert.ok(typeof smallStats.atimeMs !== 'undefined');
+        assert.ok(typeof smallStats.mtime !== 'undefined');
+        assert.ok(typeof smallStats.mtimeMs !== 'undefined');
+        assert.ok(typeof smallStats.ctime !== 'undefined');
+        assert.ok(typeof smallStats.ctimeMs !== 'undefined');
+        !smallStats.birthtime || assert.ok(typeof smallStats.birthtimeMs !== 'undefined');
+
+        var testBigStats = toBigIntStats(smallStats);
         verifyStats(testBigStats, smallStats, ALLOWABLE_DELTA);
         spys(smallStats);
         spys(testBigStats);
@@ -65,46 +82,36 @@ describe('BigIntStats', function () {
     it('should initialize from with bigInt option', function (done) {
       var spys = statsSpys();
 
-      fs.readdir(DIR, function (err, names) {
+      fs.readdir(DIR, { bigint: true }, function (err, names) {
         assert.ok(!err);
 
         for (var index in names) {
           var bigStats = fs.lstatSync(path.join(DIR, names[index]), { bigint: true });
 
-          bigStats = patchBigIntStats(bigStats);
+          bigStats = normalizeStats(bigStats);
+          assert.ok(typeof bigStats.dev !== 'undefined');
+          assert.ok(typeof bigStats.mode !== 'undefined');
+          assert.ok(typeof bigStats.nlink !== 'undefined');
+          assert.ok(typeof bigStats.uid !== 'undefined');
+          assert.ok(typeof bigStats.gid !== 'undefined');
+          assert.ok(typeof bigStats.rdev !== 'undefined');
+          assert.ok(typeof bigStats.blksize !== 'undefined');
+          assert.ok(typeof bigStats.ino !== 'undefined');
+          assert.ok(typeof bigStats.size !== 'undefined');
+          assert.ok(typeof bigStats.blocks !== 'undefined');
+          assert.ok(typeof bigStats.atime !== 'undefined');
+          assert.ok(typeof bigStats.atimeMs !== 'undefined');
+          assert.ok(typeof bigStats.atimeNs !== 'undefined');
+          assert.ok(typeof bigStats.mtime !== 'undefined');
+          assert.ok(typeof bigStats.mtimeMs !== 'undefined');
+          assert.ok(typeof bigStats.mtimeNs !== 'undefined');
+          assert.ok(typeof bigStats.ctime !== 'undefined');
+          assert.ok(typeof bigStats.ctimeMs !== 'undefined');
+          assert.ok(typeof bigStats.birthtimeMs !== 'undefined');
+          assert.ok(typeof bigStats.birthtimeNs !== 'undefined');
 
-          var smallStats = new fs.Stats(
-            Number(bigStats.dev),
-            Number(bigStats.mode),
-            Number(bigStats.nlink),
-            Number(bigStats.uid),
-            Number(bigStats.gid),
-            Number(bigStats.rdev),
-            Number(bigStats.blksize),
-            Number(bigStats.ino),
-            Number(bigStats.size),
-            Number(bigStats.blocks),
-            Number(JSBI.divide(bigStats.atimeNs, kNsPerMsBigInt)),
-            Number(JSBI.divide(bigStats.mtimeNs, kNsPerMsBigInt)),
-            Number(JSBI.divide(bigStats.ctimeNs, kNsPerMsBigInt)),
-            Number(JSBI.divide(bigStats.birthtimeNs, kNsPerMsBigInt))
-          );
-          var testBigStats = new BigIntStats(
-            bigStats.dev,
-            bigStats.mode,
-            bigStats.nlink,
-            bigStats.uid,
-            bigStats.gid,
-            bigStats.rdev,
-            bigStats.blksize,
-            bigStats.ino,
-            bigStats.size,
-            bigStats.blocks,
-            bigStats.atimeNs,
-            bigStats.mtimeNs,
-            bigStats.ctimeNs,
-            bigStats.birthtimeNs
-          );
+          var smallStats = toStats(bigStats);
+          var testBigStats = toBigIntStats(bigStats);
 
           verifyStats(testBigStats, smallStats, ALLOWABLE_DELTA);
           spys(smallStats);
