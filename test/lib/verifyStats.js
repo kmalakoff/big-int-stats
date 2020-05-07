@@ -3,9 +3,9 @@ var inspect = require('util').inspect;
 var isDate = require('lodash.isdate');
 var endsWith = require('end-with');
 var isSafeInteger = require('is-safe-integer');
-var BigInteger = require('../../lib/bigint-compat');
+var JSBI = require('jsbi-compat');
 
-var kNsPerMsBigInt = BigInteger(Math.pow(10, 6));
+var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
 
 module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
   // allowableDelta: It's possible that the file stats are updated between the
@@ -22,7 +22,7 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
         'difference of ' + key + '.getTime() should <= ' + allowableDelta + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
       );
     } else if (key === 'mode') {
-      assert.ok(BigInteger.eq(bigintStats[key], BigInteger(val)));
+      assert.ok(JSBI.equal(bigintStats[key], JSBI.BigInt(val)));
       assert.strictEqual(bigintStats.isBlockDevice(), numStats.isBlockDevice());
       assert.strictEqual(bigintStats.isCharacterDevice(), numStats.isCharacterDevice());
       assert.strictEqual(bigintStats.isDirectory(), numStats.isDirectory());
@@ -34,7 +34,7 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       var nsKey = key.replace('Ms', 'Ns');
       var msFromBigInt = bigintStats[key];
       var nsFromBigInt = bigintStats[nsKey];
-      var msFromBigIntNs = BigInteger.divide(nsFromBigInt, kNsPerMsBigInt);
+      var msFromBigIntNs = JSBI.divide(nsFromBigInt, kNsPerMsBigInt);
       var msFromNum = numStats[key];
 
       assert(
@@ -61,8 +61,8 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       );
     } else if (isSafeInteger(val)) {
       assert.ok(
-        BigInteger.eq(bigintStats[key], BigInteger(val)),
-        inspect(bigintStats[key]) + ' !== ' + inspect(BigInteger(val)) + '\n' + 'key=' + key + ', val=' + val
+        JSBI.equal(bigintStats[key], JSBI.BigInt(val)),
+        inspect(bigintStats[key]) + ' !== ' + inspect(JSBI.BigInt(val)) + '\n' + 'key=' + key + ', val=' + val
       );
     } else {
       assert(

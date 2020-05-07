@@ -1,14 +1,14 @@
-var BigInteger = require('../../lib/bigint-compat');
+var JSBI = require('jsbi-compat');
 
-var kNsPerMsBigInt = BigInteger(Math.pow(10, 6));
+var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
 
 module.exports = function patchBigIntStats(stats) {
   // doesn't need patching
-  if (stats.atimeNs || !BigInteger.isBigInt(stats.atimeMs)) return stats;
+  if (stats.atimeNs || !JSBI.isBigInt(stats.atimeMs)) return stats;
 
-  stats.atimeNs = BigInteger.times(stats.atimeMs, kNsPerMsBigInt);
-  stats.mtimeNs = BigInteger.times(stats.mtimeMs, kNsPerMsBigInt);
-  stats.ctimeNs = BigInteger.times(stats.ctimeMs, kNsPerMsBigInt);
-  stats.birthtimeNs = BigInteger.times(stats.birthtimeMs, kNsPerMsBigInt);
+  stats.atimeNs = JSBI.multiply(stats.atimeMs, kNsPerMsBigInt);
+  stats.mtimeNs = JSBI.multiply(stats.mtimeMs, kNsPerMsBigInt);
+  stats.ctimeNs = JSBI.multiply(stats.ctimeMs, kNsPerMsBigInt);
+  stats.birthtimeNs = JSBI.multiply(stats.birthtimeMs, kNsPerMsBigInt);
   return stats;
 };
