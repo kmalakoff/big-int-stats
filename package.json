@@ -1,6 +1,6 @@
 {
   "name": "big-int-stats",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Create BigIntStats from fs.Stats for compatiblity on earlier versions of Node.js",
   "main": "index.js",
   "engines": {
@@ -30,7 +30,8 @@
   "dependencies": {
     "big.js": "^5.2.2",
     "jsbi-compat": "^0.2.0",
-    "legacy-extends": "^0.4.0"
+    "legacy-extends": "^0.4.0",
+    "normalize-stats": "^1.0.0"
   },
   "devDependencies": {
     "async-each": "^1.0.3",

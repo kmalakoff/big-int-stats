@@ -27,61 +27,6 @@ function dateFromMs(ms) {
 }
 
 function BigIntStats(dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks, atimeNs, mtimeNs, ctimeNs, birthtimeNs) {
-  if (dev instanceof StatsBase) {
-    var stats = dev;
-    var self = BigIntStats.__super__.construct.call(
-      this,
-      JSBI.BigInt(stats.dev),
-      JSBI.BigInt(stats.mode),
-      JSBI.BigInt(stats.nlink),
-      JSBI.BigInt(stats.uid),
-      JSBI.BigInt(stats.gid),
-      JSBI.BigInt(stats.rdev),
-      JSBI.BigInt(stats.blksize),
-      JSBI.BigInt(stats.ino),
-      JSBI.BigInt(stats.size),
-      JSBI.BigInt(stats.blocks)
-    );
-    if (stats.atimeMs) {
-      self.atime = dateFromMs(stats.atimeMs);
-      self.atimeMs = JSBI.BigInt(Math.round(stats.atimeMs));
-      self.atimeNs = JSBI.multiply(self.atimeMs, kNsPerMsBigInt);
-    } else if (stats.atime) {
-      self.atime = stats.atime;
-      self.atimeMs = JSBI.BigInt(stats.atime.valueOf() * 1000);
-      self.atimeNs = JSBI.multiply(self.atimeMs, kNsPerMsBigInt);
-    }
-    if (stats.mtimeMs) {
-      self.mtime = dateFromMs(stats.mtimeMs);
-      self.mtimeMs = JSBI.BigInt(Math.round(stats.mtimeMs));
-      self.mtimeNs = JSBI.multiply(self.mtimeMs, kNsPerMsBigInt);
-    } else if (stats.mtime) {
-      self.mtime = stats.mtime;
-      self.mtimeMs = JSBI.BigInt(stats.mtime.valueOf() * 1000);
-      self.mtimeNs = JSBI.multiply(self.mtimeMs, kNsPerMsBigInt);
-    }
-    if (stats.ctimeMs) {
-      self.ctime = dateFromMs(stats.ctimeMs);
-      self.ctimeMs = JSBI.BigInt(Math.round(stats.ctimeMs));
-      self.ctimeNs = JSBI.multiply(self.ctimeMs, kNsPerMsBigInt);
-    } else if (stats.ctime) {
-      self.ctime = stats.ctime;
-      self.ctimeMs = JSBI.BigInt(stats.ctime.valueOf() * 1000);
-      self.ctimeNs = JSBI.multiply(self.ctimeMs, kNsPerMsBigInt);
-    }
-    if (stats.birthtimeMs) {
-      self.birthtime = dateFromMs(stats.birthtimeMs);
-      self.birthtimeMs = JSBI.BigInt(Math.round(stats.birthtimeMs));
-      self.birthtimeNs = JSBI.multiply(self.birthtimeMs, kNsPerMsBigInt);
-    } else if (stats.birthtime) {
-      self.birthtime = stats.birthtime;
-      self.birthtimeMs = JSBI.BigInt(stats.birthtime.valueOf() * 1000);
-      self.birthtimeNs = JSBI.multiply(self.birthtimeMs, kNsPerMsBigInt);
-    }
-    return self;
-  }
-
-  // eslint-disable-next-line no-redeclare
   var self = BigIntStats.__super__.construct.call(this, dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks);
   self.atimeMs = JSBI.divide(atimeNs, kNsPerMsBigInt);
   self.atime = dateFromMs(self.atimeMs);
@@ -100,8 +45,7 @@ function BigIntStats(dev, mode, nlink, uid, gid, rdev, blksize, ino, size, block
   self.birthtimeNs = birthtimeNs;
   return self;
 }
-var properties = ['dev', 'mode', 'nlink', 'uid', 'gid', 'rdev', 'blksize', 'ino', 'size', 'blocks', 'atimeNs', 'mtimeNs', 'ctimeNs', 'birthtimeNs'];
-extend(BigIntStats, StatsBase, { ensureProperties: properties });
+extend(BigIntStats, StatsBase, { ensureProperties: ['dev', 'mode', 'nlink', 'uid', 'gid', 'rdev', 'blksize', 'ino', 'size', 'blocks'] });
 
 BigIntStats.prototype._checkModeProperty = function (property) {
   if (isWindows && (property === S_IFIFO || property === S_IFBLK || property === S_IFSOCK)) {
