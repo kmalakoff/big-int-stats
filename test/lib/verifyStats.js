@@ -1,9 +1,12 @@
 var assert = require('assert');
 var inspect = require('util').inspect;
 var isDate = require('lodash.isdate');
-var endsWith = require('end-with');
-var isSafeInteger = require('is-safe-integer');
 var JSBI = require('jsbi-compat');
+
+// patches
+// eslint-disable-next-line no-extend-native
+if (typeof String.prototype.endsWith === 'undefined') String.prototype.endsWith = require('end-with');
+if (typeof Number.isSafeInteger === 'undefined') Number.isSafeInteger = require('is-safe-integer');
 
 var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
 
@@ -30,7 +33,7 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       assert.strictEqual(bigintStats.isFile(), numStats.isFile());
       assert.strictEqual(bigintStats.isSocket(), numStats.isSocket());
       assert.strictEqual(bigintStats.isSymbolicLink(), numStats.isSymbolicLink());
-    } else if (endsWith(key, 'Ms')) {
+    } else if (key.endsWith('Ms')) {
       var nsKey = key.replace('Ms', 'Ns');
       var msFromBigInt = bigintStats[key];
       var nsFromBigInt = bigintStats[nsKey];
@@ -59,7 +62,7 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
           'ms, Allowable delta = ' +
           allowableDelta
       );
-    } else if (isSafeInteger(val)) {
+    } else if (Number.isSafeInteger(val)) {
       assert.ok(
         JSBI.equal(bigintStats[key], JSBI.BigInt(val)),
         inspect(bigintStats[key]) + ' !== ' + inspect(JSBI.BigInt(val)) + '\n' + 'key=' + key + ', val=' + val
