@@ -45,29 +45,10 @@ describe('BigIntStats', function () {
 
       for (var index in names) {
         var smallStats = normalizeStats(fs.statSync(path.join(DIR, names[index])));
-
-        assert.ok(typeof smallStats.dev !== 'undefined');
-        assert.ok(typeof smallStats.mode !== 'undefined');
-        assert.ok(typeof smallStats.nlink !== 'undefined');
-        assert.ok(typeof smallStats.uid !== 'undefined');
-        assert.ok(typeof smallStats.gid !== 'undefined');
-        assert.ok(typeof smallStats.rdev !== 'undefined');
-        assert.ok(typeof smallStats.blksize !== 'undefined');
-        assert.ok(typeof smallStats.ino !== 'undefined');
-        assert.ok(typeof smallStats.size !== 'undefined');
-        assert.ok(typeof smallStats.blocks !== 'undefined');
-        assert.ok(typeof smallStats.atime !== 'undefined');
-        assert.ok(typeof smallStats.atimeMs !== 'undefined');
-        assert.ok(typeof smallStats.mtime !== 'undefined');
-        assert.ok(typeof smallStats.mtimeMs !== 'undefined');
-        assert.ok(typeof smallStats.ctime !== 'undefined');
-        assert.ok(typeof smallStats.ctimeMs !== 'undefined');
-        !smallStats.birthtime || assert.ok(typeof smallStats.birthtimeMs !== 'undefined');
-
-        var testBigStats = toBigIntStats(smallStats);
-        verifyStats(testBigStats, smallStats, ALLOWABLE_DELTA);
+        var bigStats = toBigIntStats(smallStats);
+        verifyStats(bigStats, smallStats, ALLOWABLE_DELTA);
         spys(smallStats);
-        spys(testBigStats);
+        spys(bigStats);
       }
 
       assert.equal(spys.callCount, 12);
@@ -86,36 +67,12 @@ describe('BigIntStats', function () {
         assert.ok(!err);
 
         for (var index in names) {
-          var bigStats = fs.lstatSync(path.join(DIR, names[index]), { bigint: true });
-
-          bigStats = normalizeStats(bigStats);
-          assert.ok(typeof bigStats.dev !== 'undefined');
-          assert.ok(typeof bigStats.mode !== 'undefined');
-          assert.ok(typeof bigStats.nlink !== 'undefined');
-          assert.ok(typeof bigStats.uid !== 'undefined');
-          assert.ok(typeof bigStats.gid !== 'undefined');
-          assert.ok(typeof bigStats.rdev !== 'undefined');
-          assert.ok(typeof bigStats.blksize !== 'undefined');
-          assert.ok(typeof bigStats.ino !== 'undefined');
-          assert.ok(typeof bigStats.size !== 'undefined');
-          assert.ok(typeof bigStats.blocks !== 'undefined');
-          assert.ok(typeof bigStats.atime !== 'undefined');
-          assert.ok(typeof bigStats.atimeMs !== 'undefined');
-          assert.ok(typeof bigStats.atimeNs !== 'undefined');
-          assert.ok(typeof bigStats.mtime !== 'undefined');
-          assert.ok(typeof bigStats.mtimeMs !== 'undefined');
-          assert.ok(typeof bigStats.mtimeNs !== 'undefined');
-          assert.ok(typeof bigStats.ctime !== 'undefined');
-          assert.ok(typeof bigStats.ctimeMs !== 'undefined');
-          assert.ok(typeof bigStats.birthtimeMs !== 'undefined');
-          assert.ok(typeof bigStats.birthtimeNs !== 'undefined');
-
+          var bigStats = normalizeStats(fs.lstatSync(path.join(DIR, names[index]), { bigint: true }));
           var smallStats = toStats(bigStats);
-          var testBigStats = toBigIntStats(bigStats);
 
-          verifyStats(testBigStats, smallStats, ALLOWABLE_DELTA);
+          verifyStats(bigStats, smallStats, ALLOWABLE_DELTA);
           spys(smallStats);
-          spys(testBigStats);
+          spys(bigStats);
         }
 
         assert.equal(spys.callCount, 12);
@@ -134,13 +91,13 @@ describe('BigIntStats', function () {
 
           if (isDate(bigStats[key])) {
             var time = bigStats[key].getTime();
-            var time2 = testBigStats[key].getTime();
+            var time2 = bigStats[key].getTime();
             assert(
               time - time2 <= ALLOWABLE_DELTA,
               'difference of ' + key + '.getTime() should <= ' + ALLOWABLE_DELTA + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
             );
           } else {
-            assert.strictEqual(bigStats[key], testBigStats[key], key);
+            assert.strictEqual(bigStats[key], bigStats[key], key);
           }
         }
 

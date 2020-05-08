@@ -1,6 +1,6 @@
 var fs = require('fs');
-var extend = require('legacy-extends');
 var JSBI = require('jsbi-compat');
+var extend = require('legacy-extends');
 
 // eslint-disable-next-line node/no-deprecated-api
 var constants = require('constants');
@@ -13,8 +13,6 @@ var S_IFMT_BIG = JSBI.BigInt(S_IFMT);
 var StatsBase = fs.Stats;
 var isWindows = process.platform === 'win32';
 var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
-
-if (!Math.clz32) Math.clz32 = require('clz32');
 
 // The Date constructor performs Math.floor() to the multiplytamp.
 // https://www.ecma-international.org/ecma-262/#sec-timeclip
