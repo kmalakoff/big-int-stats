@@ -19,7 +19,7 @@
   "author": "Kevin Malakoff <kmalakoff@gmail.com> (https://github.com/kmalakoff)",
   "main": "index.js",
   "scripts": {
-    "format": "eslint . --fix",
+    "format": "prettier --write .",
     "lint": "eslint .",
     "test": "mocha-compat test/spec/**/*.test.js"
   },
@@ -29,7 +29,6 @@
     "normalize-stats": "^1.0.0"
   },
   "devDependencies": {
-    "async-each": "^1.0.3",
     "babel-eslint": "^10.1.0",
     "end-with": "^1.0.2",
     "eslint": "^6.8.0",
