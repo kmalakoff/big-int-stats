@@ -48,19 +48,19 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       assert(
         msFromNum - Number(msFromBigIntNs) <= allowableDelta,
         'Number version ' +
-          key +
-          ' = ' +
-          msFromNum +
-          ', ' +
-          'BigInt version ' +
-          nsKey +
-          ' = ' +
-          nsFromBigInt +
-          'n' +
-          ' = ' +
-          msFromBigIntNs +
-          'ms, Allowable delta = ' +
-          allowableDelta
+        key +
+        ' = ' +
+        msFromNum +
+        ', ' +
+        'BigInt version ' +
+        nsKey +
+        ' = ' +
+        nsFromBigInt +
+        'n' +
+        ' = ' +
+        msFromBigIntNs +
+        'ms, Allowable delta = ' +
+        allowableDelta
       );
     } else if (Number.isSafeInteger(val)) {
       assert.ok(
@@ -68,10 +68,11 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
         inspect(bigintStats[key]) + ' !== ' + inspect(JSBI.BigInt(val)) + '\n' + 'key=' + key + ', val=' + val
       );
     } else {
-      assert(
-        Number(bigintStats[key]) - val < 1,
-        key + ' is not a safe integer, difference should < 1.\n' + 'Number version ' + val + ', BigInt version ' + bigintStats[key] + 'n'
-      );
+      typeof bigintStats[key] === 'undefined' ||
+        assert(
+          Number(bigintStats[key]) - val < 1,
+          key + ' is not a safe integer, difference should < 1.\n' + 'Number version ' + val + ', BigInt version ' + bigintStats[key] + 'n'
+        );
     }
   }
 };
