@@ -48,19 +48,19 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       assert(
         msFromNum - Number(msFromBigIntNs) <= allowableDelta,
         'Number version ' +
-        key +
-        ' = ' +
-        msFromNum +
-        ', ' +
-        'BigInt version ' +
-        nsKey +
-        ' = ' +
-        nsFromBigInt +
-        'n' +
-        ' = ' +
-        msFromBigIntNs +
-        'ms, Allowable delta = ' +
-        allowableDelta
+          key +
+          ' = ' +
+          msFromNum +
+          ', ' +
+          'BigInt version ' +
+          nsKey +
+          ' = ' +
+          nsFromBigInt +
+          'n' +
+          ' = ' +
+          msFromBigIntNs +
+          'ms, Allowable delta = ' +
+          allowableDelta
       );
     } else if (Number.isSafeInteger(val)) {
       assert.ok(
