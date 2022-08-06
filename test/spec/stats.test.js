@@ -1,10 +1,11 @@
+require('../lib/polyfills');
+
 var assert = require('assert');
 var generate = require('fs-generate');
 var rimraf = require('rimraf');
 var path = require('path');
 var fs = require('fs');
 var statsSpys = require('fs-stats-spys');
-var endsWith = require('end-with');
 var isDate = require('lodash.isdate');
 var normalizeStats = require('normalize-stats');
 
@@ -84,7 +85,7 @@ describe('BigIntStats', function () {
           // eslint-disable-next-line no-prototype-builtins
           if (!bigStats.hasOwnProperty(key)) continue;
 
-          if (endsWith(key, 'Ms')) {
+          if (key.endsWith('Ms')) {
             var nsKey = key.replace('Ms', 'Ns');
             if (!bigStats[nsKey]) continue; // in Node 10, Ms had the big ints then they were moved to Ns
           }

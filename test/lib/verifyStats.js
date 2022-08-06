@@ -3,11 +3,6 @@ var inspect = require('util').inspect;
 var isDate = require('lodash.isdate');
 var JSBI = require('jsbi-compat');
 
-// patches
-// eslint-disable-next-line no-extend-native
-if (typeof String.prototype.endsWith === 'undefined') String.prototype.endsWith = require('end-with');
-if (typeof Number.isSafeInteger === 'undefined') Number.isSafeInteger = require('is-safe-integer');
-
 var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
 
 module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
@@ -41,12 +36,23 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
       var msFromNum = numStats[key];
 
       assert(
-        msFromNum - Number(msFromBigInt) <= allowableDelta,
-        'Number version ' + key + ' = ' + msFromNum + ', ' + 'BigInt version ' + key + ' = ' + msFromBigInt + 'n, ' + 'Allowable delta = ' + allowableDelta
+        msFromNum - JSBI.toNumber(msFromBigInt) <= allowableDelta,
+        'Number version ' +
+          key +
+          ' = ' +
+          msFromNum +
+          ', ' +
+          'BigInt version ' +
+          key +
+          ' = ' +
+          JSBI.toNumber(msFromBigInt) +
+          'n, ' +
+          'Allowable delta = ' +
+          allowableDelta
       );
 
       assert(
-        msFromNum - Number(msFromBigIntNs) <= allowableDelta,
+        msFromNum - JSBI.toNumber(msFromBigIntNs) <= allowableDelta,
         'Number version ' +
           key +
           ' = ' +
@@ -55,10 +61,10 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
           'BigInt version ' +
           nsKey +
           ' = ' +
-          nsFromBigInt +
+          JSBI.toNumber(nsFromBigInt) +
           'n' +
           ' = ' +
-          msFromBigIntNs +
+          JSBI.toNumber(msFromBigIntNs) +
           'ms, Allowable delta = ' +
           allowableDelta
       );
@@ -70,7 +76,7 @@ module.exports = function verifyStats(bigintStats, numStats, allowableDelta) {
     } else {
       typeof bigintStats[key] === 'undefined' ||
         assert(
-          Number(bigintStats[key]) - val < 1,
+          JSBI.toNumber(bigintStats[key]) - val < 1,
           key + ' is not a safe integer, difference should < 1.\n' + 'Number version ' + val + ', BigInt version ' + bigintStats[key] + 'n'
         );
     }
