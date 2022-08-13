@@ -36,7 +36,7 @@
     "normalize-stats": "^1.0.1"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "^5.32.0",
+    "@typescript-eslint/parser": "^5.33.0",
     "core-js": "^3.24.1",
     "depcheck": "^1.4.3",
     "eslint": "^8.21.0",
