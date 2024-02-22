@@ -1,1 +1,1 @@
-ignores: ["depcheck"]
+ignores: ["big-int-stats", "depcheck", "ts-dev-stack", "@types/*"]

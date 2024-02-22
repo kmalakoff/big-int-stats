@@ -11,7 +11,7 @@ var S_IFMT_BIG = JSBI.BigInt(S_IFMT);
 
 var StatsBase = fs.Stats;
 var isWindows = process.platform === 'win32';
-var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
+var kNsPerMsBigInt = JSBI.BigInt(10 ** 6);
 
 // The Date constructor performs Math.floor() to the multiplytamp.
 // https://www.ecma-international.org/ecma-262/#sec-timeclip

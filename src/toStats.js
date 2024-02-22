@@ -1,7 +1,7 @@
 var fs = require('fs');
 var JSBI = require('jsbi-compat');
 
-var kNsPerMsBigInt = JSBI.BigInt(Math.pow(10, 6));
+var kNsPerMsBigInt = JSBI.BigInt(10 ** 6);
 
 module.exports = function toStats(stats) {
   if (typeof stats.dev !== 'bigint') return stats;

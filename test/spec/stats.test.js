@@ -9,8 +9,7 @@ var statsSpys = require('fs-stats-spys');
 var isDate = require('lodash.isdate');
 var normalizeStats = require('normalize-stats');
 
-var toBigIntStats = require('../../lib/toBigIntStats');
-var toStats = require('../../lib/toStats');
+const { toBigIntStats, toStats } = require('big-int-stats');
 var verifyStats = require('../lib/verifyStats');
 
 var TEST_DIR = path.resolve(path.join(__dirname, '..', '..', '.tmp', 'test'));
@@ -28,20 +27,20 @@ var STRUCTURE = {
 
 var ALLOWABLE_DELTA = 10;
 
-describe('BigIntStats', function () {
-  after(function (done) {
+describe('BigIntStats', () => {
+  after((done) => {
     rimraf(TEST_DIR, done);
   });
-  beforeEach(function (done) {
-    rimraf(TEST_DIR, function () {
+  beforeEach((done) => {
+    rimraf(TEST_DIR, () => {
       generate(TEST_DIR, STRUCTURE, done);
     });
   });
 
-  it('should load stats', function (done) {
+  it('should load stats', (done) => {
     var spys = statsSpys();
 
-    fs.readdir(TEST_DIR, function (err, names) {
+    fs.readdir(TEST_DIR, (err, names) => {
       assert.ok(!err);
 
       for (var index in names) {
@@ -61,10 +60,10 @@ describe('BigIntStats', function () {
   });
 
   typeof BigInt === 'undefined' ||
-    it('should initialize from with bigInt option', function (done) {
+    it('should initialize from with bigInt option', (done) => {
       var spys = statsSpys();
 
-      fs.readdir(TEST_DIR, { bigint: true }, function (err, names) {
+      fs.readdir(TEST_DIR, { bigint: true }, (err, names) => {
         assert.ok(!err);
 
         for (var index in names) {
@@ -82,7 +81,7 @@ describe('BigIntStats', function () {
         assert.equal(spys.link.callCount, 2);
 
         for (var key in bigStats) {
-          // eslint-disable-next-line no-prototype-builtins
+          // biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
           if (!bigStats.hasOwnProperty(key)) continue;
 
           if (key.endsWith('Ms')) {
@@ -93,10 +92,7 @@ describe('BigIntStats', function () {
           if (isDate(bigStats[key])) {
             var time = bigStats[key].getTime();
             var time2 = bigStats[key].getTime();
-            assert(
-              time - time2 <= ALLOWABLE_DELTA,
-              'difference of ' + key + '.getTime() should <= ' + ALLOWABLE_DELTA + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
-            );
+            assert(time - time2 <= ALLOWABLE_DELTA, `difference of ${key}.getTime() should <= ${ALLOWABLE_DELTA}.\nNumber version ${time}, BigInt version ${time2}n`);
           } else {
             assert.strictEqual(bigStats[key], bigStats[key], key);
           }
