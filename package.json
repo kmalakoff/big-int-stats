@@ -47,7 +47,7 @@
     "lodash.isdate": "^4.0.1",
     
     "rimraf": "^2.7.1",
-    "ts-dev-stack": "^0.15.3"
+    "ts-dev-stack": "^1.18.0"
   },
   "engines": {
     "node": ">=0.8"
