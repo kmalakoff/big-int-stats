@@ -17,42 +17,42 @@
   },
   "license": "MIT",
   "author": "Kevin Malakoff <kmalakoff@gmail.com> (https://github.com/kmalakoff)",
-  "main": "lib/index.js",
-  "files": [
-    "lib"
-  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/cjs/index.js",
+  "types": "dist/cjs/index.d.cts",
   "scripts": {
-    "build": "",
-    "format": "prettier --write .",
-    "lint": "eslint .",
-    "prepublishOnly": "npm run lint && depcheck",
-    "test": "mocha-compat test/spec/**/*.test.js",
-    "test:engines": "nvu engines npm test"
+    "build": "tsds build",
+    "deploy": "tsds deploy",
+    "format": "biome check --write --unsafe src/ test/",
+    "test": "tsds test:node --no-timeouts",
+    "test:engines": "nvu engines npm test",
+    "version": "tsds version"
   },
   "dependencies": {
     "fs-constants": "^1.0.0",
     "jsbi-compat": "^0.2.2",
-    "legacy-extends": "^1.0.1",
-    "normalize-stats": "^1.0.1"
+    "normalize-stats": "^1.1.0"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "^5.32.0",
-    "core-js": "^3.24.1",
-    "depcheck": "^1.4.3",
-    "eslint": "^8.21.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.2.4",
-    "eslint-plugin-promise": "^6.0.0",
-    "fs-generate": "^1.8.5",
-    "fs-stats-spys": "^1.0.2",
-    "lodash.isdate": "^4.0.1",
-    "mocha-compat": "^3.5.5",
-    "prettier": "^2.7.1",
-    "rimraf": "^2.7.1"
+    "@types/mocha": "*",
+    "@types/node": "*",
+    "core-js": "*",
+    "fs-generate": "*",
+    "fs-stats-spys": "*",
+    "lodash.isdate": "*",
+    "rimraf2": "*"
   },
   "engines": {
     "node": ">=0.8"
+  },
+  "tsds": {
+    "source": "src/index.ts"
   }
 }
