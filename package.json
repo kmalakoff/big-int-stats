@@ -1,6 +1,6 @@
 {
   "name": "big-int-stats",
-  "version": "1.3.2",
+  "version": "2.0.0",
   "description": "Create BigIntStats from fs.Stats for compatiblity on earlier versions of Node.js",
   "keywords": [
     "dirent",
