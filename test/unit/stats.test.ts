@@ -1,18 +1,19 @@
-require('../lib/polyfills');
+import '../lib/polyfills';
 
-var assert = require('assert');
-var generate = require('fs-generate');
-var rimraf = require('rimraf');
-var path = require('path');
-var fs = require('fs');
-var statsSpys = require('fs-stats-spys');
-var isDate = require('lodash.isdate');
-var normalizeStats = require('normalize-stats');
+import assert from 'assert';
+// @ts-ignore
+import { toBigIntStats, toStats } from 'big-int-stats';
+import fs from 'fs';
+import generate from 'fs-generate';
+import statsSpys from 'fs-stats-spys';
+import isDate from 'lodash.isdate';
+import normalizeStats from 'normalize-stats';
+import path from 'path';
+import rimraf2 from 'rimraf2';
+import url from 'url';
+import verifyStats from '../lib/verifyStats';
 
-var toBigIntStats = require('../../lib/toBigIntStats');
-var toStats = require('../../lib/toStats');
-var verifyStats = require('../lib/verifyStats');
-
+const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 var TEST_DIR = path.resolve(path.join(__dirname, '..', '..', '.tmp', 'test'));
 var STRUCTURE = {
   file1: 'a',
@@ -28,20 +29,22 @@ var STRUCTURE = {
 
 var ALLOWABLE_DELTA = 10;
 
-describe('BigIntStats', function () {
-  after(function (done) {
-    rimraf(TEST_DIR, done);
+describe('BigIntStats', () => {
+  after((done) => {
+    rimraf2(TEST_DIR, { disableGlob: true }, done);
   });
-  beforeEach(function (done) {
-    rimraf(TEST_DIR, function () {
-      generate(TEST_DIR, STRUCTURE, done);
+  beforeEach((done) => {
+    rimraf2(TEST_DIR, { disableGlob: true }, () => {
+      generate(TEST_DIR, STRUCTURE, (): undefined => {
+        done();
+      });
     });
   });
 
-  it('should load stats', function (done) {
+  it('should load stats', (done) => {
     var spys = statsSpys();
 
-    fs.readdir(TEST_DIR, function (err, names) {
+    fs.readdir(TEST_DIR, (err, names) => {
       assert.ok(!err);
 
       for (var index in names) {
@@ -60,13 +63,20 @@ describe('BigIntStats', function () {
     });
   });
 
+  type ReadDirOptions = {
+    encoding: 'buffer';
+    withFileTypes: true;
+    recursive?: boolean | undefined;
+  };
+
   typeof BigInt === 'undefined' ||
-    it('should initialize from with bigInt option', function (done) {
+    it('should initialize from with bigInt option', (done) => {
       var spys = statsSpys();
 
-      fs.readdir(TEST_DIR, { bigint: true }, function (err, names) {
+      fs.readdir(TEST_DIR, { bigint: true } as unknown as ReadDirOptions, (err: NodeJS.ErrnoException | null, files: fs.Dirent<Buffer>[]) => {
         assert.ok(!err);
 
+        const names = files as unknown as string[];
         for (var index in names) {
           var bigStats = normalizeStats(fs.lstatSync(path.join(TEST_DIR, names[index]), { bigint: true }));
           var smallStats = toStats(bigStats);
@@ -82,7 +92,7 @@ describe('BigIntStats', function () {
         assert.equal(spys.link.callCount, 2);
 
         for (var key in bigStats) {
-          // eslint-disable-next-line no-prototype-builtins
+          // biome-ignore lint/suspicious/noPrototypeBuiltins: hasOwnProperty
           if (!bigStats.hasOwnProperty(key)) continue;
 
           if (key.endsWith('Ms')) {
@@ -93,10 +103,7 @@ describe('BigIntStats', function () {
           if (isDate(bigStats[key])) {
             var time = bigStats[key].getTime();
             var time2 = bigStats[key].getTime();
-            assert(
-              time - time2 <= ALLOWABLE_DELTA,
-              'difference of ' + key + '.getTime() should <= ' + ALLOWABLE_DELTA + '.\n' + 'Number version ' + time + ', BigInt version ' + time2 + 'n'
-            );
+            assert(time - time2 <= ALLOWABLE_DELTA, `difference of ${key}.getTime() should <= ${ALLOWABLE_DELTA}.\nNumber version ${time}, BigInt version ${time2}n`);
           } else {
             assert.strictEqual(bigStats[key], bigStats[key], key);
           }
