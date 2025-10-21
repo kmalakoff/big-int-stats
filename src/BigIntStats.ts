@@ -21,7 +21,7 @@ function dateFromMs(ms) {
   return new Date(JSBI.toNumber(ms) + 0.5);
 }
 
-// @ts-ignore
+// @ts-expect-error
 export default class BigIntStats extends Stats {
   atime: Date;
   mtime: Date;

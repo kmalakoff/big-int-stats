@@ -1,5 +1,4 @@
 import assert from 'assert';
-// @ts-ignore
 import { BigIntStats, toBigIntStats, toStats } from 'big-int-stats';
 
 describe('exports .ts', () => {
