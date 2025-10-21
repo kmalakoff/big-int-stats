@@ -1,1 +1,0 @@
-{"version":3,"sources":["/Users/kevin/Dev/_archive/@unmaintained/big-int-stats/src/types.ts"],"sourcesContent":["import type { BigIntStats, Dirent, Stats } from 'fs';\n\nexport type AnyStats = Stats | BigIntStats | Dirent;\n"],"names":[],"mappings":"AAEA,WAAoD"}
