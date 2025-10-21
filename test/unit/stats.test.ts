@@ -1,7 +1,6 @@
-import '../lib/polyfills';
+import '../lib/polyfills.ts';
 
 import assert from 'assert';
-// @ts-ignore
 import { toBigIntStats, toStats } from 'big-int-stats';
 import fs from 'fs';
 import generate from 'fs-generate';
@@ -11,7 +10,7 @@ import normalizeStats from 'normalize-stats';
 import path from 'path';
 import rimraf2 from 'rimraf2';
 import url from 'url';
-import verifyStats from '../lib/verifyStats';
+import verifyStats from '../lib/verifyStats.ts';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
 var TEST_DIR = path.resolve(path.join(__dirname, '..', '..', '.tmp', 'test'));
