@@ -10,7 +10,7 @@ export default function toStats(stats: AnyStats): Stats {
   if (typeof (stats as StatsBase<number>).dev !== 'bigint') return stats as Stats;
 
   const bigStats = stats as BigIntStats;
-  // @ts-ignore
+  // @ts-expect-error
   return new fs.Stats(
     Number(bigStats.dev),
     Number(bigStats.mode),
