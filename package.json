@@ -41,7 +41,7 @@
   "dependencies": {
     "fs-constants": "^1.0.0",
     "jsbi-compat": "^1.0.3",
-    "normalize-stats": "^1.1.3"
+    "normalize-stats": "^1.1.4"
   },
   "devDependencies": {
     "@biomejs/biome": "*",
