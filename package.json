@@ -48,10 +48,10 @@
     "@types/mocha": "*",
     "@types/node": "*",
     "fs-generate": "*",
+    "fs-remove-compat": "*",
     "fs-stats-spys": "*",
     "lodash.isdate": "*",
     "node-version-use": "*",
-    "rimraf2": "*",
     "ts-dev-stack": "*",
     "tsds-config": "*"
   },

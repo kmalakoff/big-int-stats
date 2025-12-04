@@ -2,11 +2,11 @@ import assert from 'assert';
 import { toBigIntStats, toStats } from 'big-int-stats';
 import fs from 'fs';
 import generate from 'fs-generate';
+import { safeRm } from 'fs-remove-compat';
 import statsSpys from 'fs-stats-spys';
 import isDate from 'lodash.isdate';
 import normalizeStats from 'normalize-stats';
 import path from 'path';
-import rimraf2 from 'rimraf2';
 import url from 'url';
 import { stringEndsWith } from '../lib/compat.ts';
 import verifyStats from '../lib/verifyStats.ts';
@@ -29,10 +29,10 @@ var ALLOWABLE_DELTA = 10;
 
 describe('BigIntStats', () => {
   after((done) => {
-    rimraf2(TEST_DIR, { disableGlob: true }, done);
+    safeRm(TEST_DIR, done);
   });
   beforeEach((done) => {
-    rimraf2(TEST_DIR, { disableGlob: true }, () => {
+    safeRm(TEST_DIR, () => {
       generate(TEST_DIR, STRUCTURE, (): undefined => {
         done();
       });
