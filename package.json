@@ -41,8 +41,8 @@
   },
   "dependencies": {
     "fs-constants": "^1.0.0",
-    "jsbi-compat": "^1.0.4",
-    "normalize-stats": "^1.1.5"
+    "jsbi-compat": "^1.0.5",
+    "normalize-stats": "^1.1.6"
   },
   "devDependencies": {
     "@types/mocha": "*",
