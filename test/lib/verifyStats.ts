@@ -9,13 +9,13 @@ const kNsPerMsBigInt = JSBI.BigInt(10 ** 6);
 export default function verifyStats(bigintStats, numStats, allowableDelta) {
   // allowableDelta: It's possible that the file stats are updated between the
   // two stat() calls so allow for a small difference.
-  for (var key in numStats) {
+  for (const key in numStats) {
     // biome-ignore lint/suspicious/noPrototypeBuiltins: hasOwnProperty
     if (!numStats.hasOwnProperty(key)) continue;
-    var val = numStats[key];
+    const val = numStats[key];
     if (isDate(val)) {
-      var time = val.getTime();
-      var time2 = bigintStats[key].getTime();
+      const time = val.getTime();
+      const time2 = bigintStats[key].getTime();
       assert(time - time2 <= allowableDelta, `difference of ${key}.getTime() should <= ${allowableDelta}.\nNumber version ${time}, BigInt version ${time2}n`);
     } else if (key === 'mode') {
       assert.ok(JSBI.equal(bigintStats[key], JSBI.BigInt(val)));
@@ -27,11 +27,11 @@ export default function verifyStats(bigintStats, numStats, allowableDelta) {
       assert.strictEqual(bigintStats.isSocket(), numStats.isSocket());
       assert.strictEqual(bigintStats.isSymbolicLink(), numStats.isSymbolicLink());
     } else if (stringEndsWith(key, 'Ms')) {
-      var nsKey = key.replace('Ms', 'Ns');
-      var msFromBigInt = bigintStats[key];
-      var nsFromBigInt = bigintStats[nsKey];
-      var msFromBigIntNs = JSBI.divide(nsFromBigInt, kNsPerMsBigInt);
-      var msFromNum = numStats[key];
+      const nsKey = key.replace('Ms', 'Ns');
+      const msFromBigInt = bigintStats[key];
+      const nsFromBigInt = bigintStats[nsKey];
+      const msFromBigIntNs = JSBI.divide(nsFromBigInt, kNsPerMsBigInt);
+      const msFromNum = numStats[key];
 
       assert(msFromNum - JSBI.toNumber(msFromBigInt) <= allowableDelta, `Number version ${key} = ${msFromNum}, BigInt version ${key} = ${JSBI.toNumber(msFromBigInt)}n, Allowable delta = ${allowableDelta}`);
 

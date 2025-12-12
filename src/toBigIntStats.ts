@@ -3,7 +3,7 @@ import JSBI from 'jsbi-compat';
 
 import BigIntStatsEmulated from './BigIntStats.ts';
 
-var kNsPerMsBigInt = JSBI.BigInt(10 ** 6);
+const kNsPerMsBigInt = JSBI.BigInt(10 ** 6);
 
 import type { AnyStats } from './types.ts';
 
