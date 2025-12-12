@@ -2,14 +2,14 @@ import { Stats } from 'fs';
 import constants from 'fs-constants';
 import JSBI from 'jsbi-compat';
 
-var S_IFIFO = constants.S_IFIFO;
-var S_IFBLK = constants.S_IFBLK;
-var S_IFSOCK = constants.S_IFSOCK;
-var S_IFMT = constants.S_IFMT;
-var S_IFMT_BIG = JSBI.BigInt(S_IFMT);
+const S_IFIFO = constants.S_IFIFO;
+const S_IFBLK = constants.S_IFBLK;
+const S_IFSOCK = constants.S_IFSOCK;
+const S_IFMT = constants.S_IFMT;
+const S_IFMT_BIG = JSBI.BigInt(S_IFMT);
 
-var isWindows = process.platform === 'win32';
-var kNsPerMsBigInt = JSBI.BigInt(10 ** 6);
+const isWindows = process.platform === 'win32';
+const kNsPerMsBigInt = JSBI.BigInt(10 ** 6);
 
 // The Date constructor performs Math.floor() to the multiplytamp.
 // https://www.ecma-international.org/ecma-262/#sec-timeclip
