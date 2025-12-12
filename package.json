@@ -41,15 +41,15 @@
   },
   "dependencies": {
     "fs-constants": "^1.0.0",
-    "jsbi-compat": "^1.0.6",
-    "normalize-stats": "^1.1.7"
+    "jsbi-compat": "^1.0.7",
+    "normalize-stats": "^1.1.8"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.0.1",
     "fs-generate": "^1.10.8",
-    "fs-remove-compat": "^0.2.1",
-    "fs-stats-spys": "^1.2.7",
+    "fs-remove-compat": "^0.2.2",
+    "fs-stats-spys": "^1.2.8",
     "lodash.isdate": "^4.0.1",
     "node-version-use": "^2.1.5",
     "ts-dev-stack": "^1.21.3",
