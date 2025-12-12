@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "fs-constants": "^1.0.0",
-    "jsbi-compat": "^1.0.5",
+    "jsbi-compat": "^1.0.6",
     "normalize-stats": "^1.1.7"
   },
   "devDependencies": {
@@ -53,7 +53,7 @@
     "lodash.isdate": "^4.0.1",
     "node-version-use": "^2.1.5",
     "ts-dev-stack": "^1.21.3",
-    "tsds-config": "^0.2.0"
+    "tsds-config": "^0.2.1"
   },
   "engines": {
     "node": ">=0.8"
