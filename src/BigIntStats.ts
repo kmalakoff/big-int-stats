@@ -8,7 +8,7 @@ const S_IFSOCK = constants.S_IFSOCK;
 const S_IFMT = constants.S_IFMT;
 const S_IFMT_BIG = JSBI.BigInt(S_IFMT);
 
-const isWindows = process.platform === 'win32';
+const isWindows = process.platform === 'win32' || /^(msys|cygwin)$/.test(process.env.OSTYPE);
 const kNsPerMsBigInt = JSBI.BigInt(10 ** 6);
 
 // The Date constructor performs Math.floor() to the multiplytamp.
