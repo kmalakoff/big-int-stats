@@ -45,15 +45,15 @@
     "normalize-stats": "^1.1.9"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.10",
-    "@types/node": "^25.0.2",
-    "fs-generate": "^1.10.10",
-    "fs-remove-compat": "^0.2.4",
-    "fs-stats-spys": "^1.2.9",
+    "@types/mocha": "*",
+    "@types/node": "*",
+    "fs-generate": "^1.10.11",
+    "fs-remove-compat": "^1.0.0",
+    "fs-stats-spys": "^1.0.0",
     "lodash.isdate": "^4.0.1",
-    "node-version-use": "^2.1.7",
-    "ts-dev-stack": "^1.21.3",
-    "tsds-config": "^0.2.2"
+    "node-version-use": "*",
+    "ts-dev-stack": "*",
+    "tsds-config": "*"
   },
   "engines": {
     "node": ">=0.8"
