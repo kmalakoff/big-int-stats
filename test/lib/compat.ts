@@ -8,12 +8,11 @@
  * - Uses native endsWith on Node 4+
  * - Falls back to indexOf-based check on Node 0.8-4
  */
-export function stringEndsWith(str: string, search: string): boolean {
-  if (typeof str.endsWith === 'function') {
-    return str.endsWith(search);
-  }
-  const pos = str.length - search.length;
-  return pos >= 0 && str.indexOf(search, pos) === pos;
+const hasEndsWith = typeof String.prototype.endsWith === 'function';
+export function stringEndsWith(str: string, search: string, position?: number): boolean {
+  if (hasEndsWith) return str.endsWith(search, position);
+  const len = position === undefined ? str.length : position;
+  return str.lastIndexOf(search) === len - search.length;
 }
 
 /**
@@ -21,9 +20,8 @@ export function stringEndsWith(str: string, search: string): boolean {
  * - Uses native isSafeInteger on Node 0.12+
  * - Falls back to manual check on Node 0.8-0.10
  */
+const hasIsSafeInteger = typeof Number.isSafeInteger === 'function';
 export function numberIsSafeInteger(value: number): boolean {
-  if (typeof Number.isSafeInteger === 'function') {
-    return Number.isSafeInteger(value);
-  }
+  if (hasIsSafeInteger) return Number.isSafeInteger(value);
   return typeof value === 'number' && Number.isFinite(value) && Math.floor(value) === value && value >= -9007199254740991 && value <= 9007199254740991;
 }
