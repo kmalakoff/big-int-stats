@@ -24,8 +24,9 @@ const STRUCTURE = {
   filelink1: '~dir3/dir4/file1',
   'dir3/filelink2': '~dir2/file1',
 };
-
-const ALLOWABLE_DELTA = 10;
+// Node 26+ changed fs.Stats constructor to expect seconds instead of milliseconds
+const major = +process.versions.node.split('.')[0];
+const ALLOWABLE_DELTA = major > 24 ? 2000 : 10;
 
 describe('BigIntStats', () => {
   after((done) => {
@@ -48,7 +49,7 @@ describe('BigIntStats', () => {
       for (const index in names) {
         const smallStats = normalizeStats(fs.statSync(path.join(TEST_DIR, names[index])));
         const bigStats = toBigIntStats(smallStats);
-        verifyStats(bigStats, smallStats, ALLOWABLE_DELTA);
+        verifyStats(bigStats as unknown as Record<string, unknown>, smallStats as unknown as Record<string, unknown>, ALLOWABLE_DELTA);
         spys(smallStats);
         spys(bigStats);
       }
@@ -79,25 +80,26 @@ describe('BigIntStats', () => {
           const bigStats = normalizeStats(fs.lstatSync(path.join(TEST_DIR, names[index]), { bigint: true }));
           const smallStats = toStats(bigStats);
 
-          verifyStats(bigStats, smallStats, ALLOWABLE_DELTA);
+          verifyStats(bigStats as unknown as Record<string, unknown>, smallStats as unknown as Record<string, unknown>, ALLOWABLE_DELTA);
           spys(smallStats);
           spys(bigStats);
 
-          for (const key in bigStats) {
+          const bigStatsRecord = bigStats as unknown as Record<string, unknown>;
+          for (const key in bigStatsRecord) {
             // biome-ignore lint/suspicious/noPrototypeBuiltins: hasOwnProperty
-            if (!bigStats.hasOwnProperty(key)) continue;
+            if (!bigStatsRecord.hasOwnProperty(key)) continue;
 
             if (stringEndsWith(key, 'Ms')) {
               const nsKey = key.replace('Ms', 'Ns');
-              if (!bigStats[nsKey]) continue; // in Node 10, Ms had the big ints then they were moved to Ns
+              if (!bigStatsRecord[nsKey]) continue;
             }
 
-            if (isDate(bigStats[key])) {
-              const time = bigStats[key].getTime();
-              const time2 = bigStats[key].getTime();
+            if (isDate(bigStatsRecord[key])) {
+              const time = (bigStatsRecord[key] as Date).getTime();
+              const time2 = (bigStatsRecord[key] as Date).getTime();
               assert(time - time2 <= ALLOWABLE_DELTA, `difference of ${key}.getTime() should <= ${ALLOWABLE_DELTA}.\nNumber version ${time}, BigInt version ${time2}n`);
             } else {
-              assert.strictEqual(bigStats[key], bigStats[key], key);
+              assert.strictEqual(bigStatsRecord[key], bigStatsRecord[key], key);
             }
           }
         }
