@@ -1,1 +1,1 @@
-ignores: ["node-version-use", "ts-dev-stack", "big-int-stats", "depcheck", "ts-dev-stack", "@types/*"]
+ignores: ["big-int-stats", "node-version-use", "ts-dev-stack", "depcheck", "@types/*"]
