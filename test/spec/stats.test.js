@@ -12,7 +12,7 @@ var toBigIntStats = require('../../lib/toBigIntStats');
 var toStats = require('../../lib/toStats');
 var verifyStats = require('../lib/verifyStats');
 
-var DIR = path.resolve(path.join(__dirname, '..', 'data'));
+var TEST_DIR = path.resolve(path.join(__dirname, '..', '..', '.tmp', 'test'));
 var STRUCTURE = {
   file1: 'a',
   file2: 'b',
@@ -29,22 +29,22 @@ var ALLOWABLE_DELTA = 10;
 
 describe('BigIntStats', function () {
   after(function (done) {
-    rimraf(DIR, done);
+    rimraf(TEST_DIR, done);
   });
   beforeEach(function (done) {
-    rimraf(DIR, function () {
-      generate(DIR, STRUCTURE, done);
+    rimraf(TEST_DIR, function () {
+      generate(TEST_DIR, STRUCTURE, done);
     });
   });
 
   it('should load stats', function (done) {
     var spys = statsSpys();
 
-    fs.readdir(DIR, function (err, names) {
+    fs.readdir(TEST_DIR, function (err, names) {
       assert.ok(!err);
 
       for (var index in names) {
-        var smallStats = normalizeStats(fs.statSync(path.join(DIR, names[index])));
+        var smallStats = normalizeStats(fs.statSync(path.join(TEST_DIR, names[index])));
         var bigStats = toBigIntStats(smallStats);
         verifyStats(bigStats, smallStats, ALLOWABLE_DELTA);
         spys(smallStats);
@@ -63,11 +63,11 @@ describe('BigIntStats', function () {
     it('should initialize from with bigInt option', function (done) {
       var spys = statsSpys();
 
-      fs.readdir(DIR, { bigint: true }, function (err, names) {
+      fs.readdir(TEST_DIR, { bigint: true }, function (err, names) {
         assert.ok(!err);
 
         for (var index in names) {
-          var bigStats = normalizeStats(fs.lstatSync(path.join(DIR, names[index]), { bigint: true }));
+          var bigStats = normalizeStats(fs.lstatSync(path.join(TEST_DIR, names[index]), { bigint: true }));
           var smallStats = toStats(bigStats);
 
           verifyStats(bigStats, smallStats, ALLOWABLE_DELTA);

@@ -2,8 +2,7 @@ var fs = require('fs');
 var JSBI = require('jsbi-compat');
 var extend = require('legacy-extends');
 
-// eslint-disable-next-line node/no-deprecated-api
-var constants = require('constants');
+var constants = require('fs-constants');
 var S_IFIFO = constants.S_IFIFO;
 var S_IFBLK = constants.S_IFBLK;
 var S_IFSOCK = constants.S_IFSOCK;
@@ -25,7 +24,7 @@ function dateFromMs(ms) {
 }
 
 function BigIntStats(dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks, atimeNs, mtimeNs, ctimeNs, birthtimeNs) {
-  var self = BigIntStats.__super__.construct.call(this, dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks);
+  var self = BigIntStats.superConstruct.call(this, dev, mode, nlink, uid, gid, rdev, blksize, ino, size, blocks);
   self.atimeMs = JSBI.divide(atimeNs, kNsPerMsBigInt);
   self.atime = dateFromMs(self.atimeMs);
   self.atimeNs = atimeNs;
