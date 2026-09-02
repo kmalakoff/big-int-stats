@@ -1,6 +1,6 @@
 {
   "name": "big-int-stats",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Create BigIntStats from fs.Stats for compatiblity on earlier versions of Node.js",
   "main": "index.js",
   "engines": {
