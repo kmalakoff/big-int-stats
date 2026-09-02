@@ -1,5 +1,3 @@
-import '../lib/polyfills.ts';
-
 import assert from 'assert';
 import { toBigIntStats, toStats } from 'big-int-stats';
 import fs from 'fs';
@@ -10,6 +8,7 @@ import normalizeStats from 'normalize-stats';
 import path from 'path';
 import rimraf2 from 'rimraf2';
 import url from 'url';
+import { stringEndsWith } from '../lib/compat.ts';
 import verifyStats from '../lib/verifyStats.ts';
 
 const __dirname = path.dirname(typeof __filename !== 'undefined' ? __filename : url.fileURLToPath(import.meta.url));
@@ -94,7 +93,7 @@ describe('BigIntStats', () => {
           // biome-ignore lint/suspicious/noPrototypeBuiltins: hasOwnProperty
           if (!bigStats.hasOwnProperty(key)) continue;
 
-          if (key.endsWith('Ms')) {
+          if (stringEndsWith(key, 'Ms')) {
             var nsKey = key.replace('Ms', 'Ns');
             if (!bigStats[nsKey]) continue; // in Node 10, Ms had the big ints then they were moved to Ns
           }
