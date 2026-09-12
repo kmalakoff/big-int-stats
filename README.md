@@ -1,31 +1,20 @@
-## big-int-stats
+# big-int-stats
 
-Create BigIntStats from fs.Stats for compatiblity on earlier versions of Node.js.
+Create BigInt stats from `fs.Stats` for compatibility with earlier Node.js
+versions.
 
+```bash
+npm install big-int-stats
 ```
-var assert = require('assert');
-var BigIntStats = require('big-int-stats');
+
+```js
+var BigIntStats = require('big-int-stats').BigIntStats;
 var fs = require('fs');
 
 var smallStats = fs.statSync(__dirname);
 var testBigStats1 = new BigIntStats(smallStats);
 
-var bigStats = fs.lstatSync(__dirname, { bigint: true });
-var testBigStats2 = new BigIntStats(
-  bigStats.dev,
-  bigStats.mode,
-  bigStats.nlink,
-  bigStats.uid,
-  bigStats.gid,
-  bigStats.rdev,
-  bigStats.blksize,
-  bigStats.ino,
-  bigStats.size,
-  bigStats.blocks,
-  bigStats.atimeNs,
-  bigStats.mtimeNs,
-  bigStats.ctimeNs,
-  bigStats.birthtimeNs
-);
-
+console.log(testBigStats1.isDirectory()); // true
 ```
+
+The package also exports `toBigIntStats` and `toStats` for converting between regular and BigInt stats objects.
