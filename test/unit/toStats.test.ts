@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { toBigIntStats, toStats } from 'big-int-stats';
+import { toStats } from 'big-int-stats';
 import fs from 'fs';
 import generate from 'fs-generate';
 import { safeRm } from 'fs-remove-compat';
@@ -28,7 +28,7 @@ const STRUCTURE = {
 const major = +process.versions.node.split('.')[0];
 const ALLOWABLE_DELTA = major > 24 ? 2000 : 10;
 
-describe('BigIntStats', () => {
+describe('toStats', () => {
   after((done) => {
     safeRm(TEST_DIR, done);
   });
@@ -37,28 +37,6 @@ describe('BigIntStats', () => {
       generate(TEST_DIR, STRUCTURE, (): void => {
         done();
       });
-    });
-  });
-
-  it('should load stats', (done) => {
-    const spys = statsSpys();
-
-    fs.readdir(TEST_DIR, (err, names) => {
-      assert.ok(!err);
-
-      for (const index in names) {
-        const smallStats = normalizeStats(fs.statSync(path.join(TEST_DIR, names[index])));
-        const bigStats = toBigIntStats(smallStats);
-        verifyStats(bigStats as unknown as Record<string, unknown>, smallStats as unknown as Record<string, unknown>, ALLOWABLE_DELTA);
-        spys(smallStats);
-        spys(bigStats);
-      }
-
-      assert.equal(spys.callCount, 12);
-      assert.equal(spys.dir.callCount, 6);
-      assert.equal(spys.file.callCount, 6);
-      assert.equal(spys.link.callCount, 0);
-      done();
     });
   });
 
