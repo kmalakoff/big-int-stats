@@ -42,16 +42,16 @@
   "dependencies": {
     "fs-constants": "^1.0.0",
     "jsbi-compat": "^1.0.5",
-    "normalize-stats": "^1.1.6"
+    "normalize-stats": "^1.1.7"
   },
   "devDependencies": {
     "@types/mocha": "*",
     "@types/node": "*",
     "fs-generate": "*",
+    "fs-remove-compat": "*",
     "fs-stats-spys": "*",
     "lodash.isdate": "*",
     "node-version-use": "*",
-    "rimraf2": "*",
     "ts-dev-stack": "*",
     "tsds-config": "*"
   },
